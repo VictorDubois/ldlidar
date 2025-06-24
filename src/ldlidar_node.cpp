@@ -33,6 +33,7 @@ LD06::LD06()
     else
     {
       RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Can't find LiDAR LD06");
+      m_cannot_find_lidar = true;
     }
   }
 
@@ -52,6 +53,7 @@ LD06::LD06()
   else 
   {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Can't open the serial port");
+    m_cannot_open_serial_port = true;
   }
 
   loop_timer_ = this->create_wall_timer(
@@ -67,4 +69,16 @@ void LD06::publishLoop()
     lidar_pub_->publish(lidar_->GetLaserScan());
     lidar_->ResetFrameReady();
   }
+}
+
+void LD06::produce_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat)
+{
+    if (m_cannot_open_serial_port)
+    {
+        stat.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unable to open serial port");
+    }
+    if (m_cannot_find_lidar)
+    {
+        stat.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unable to find lidar");
+    }
 }

@@ -71,12 +71,20 @@ void LD06::publishLoop()
 
 void LD06::produce_diagnostics(diagnostic_updater::DiagnosticStatusWrapper& stat)
 {
+    bool l_error = false;
     if (m_cannot_open_serial_port)
     {
         stat.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unable to open serial port");
+        l_error = true;
     }
     if (m_cannot_find_lidar)
     {
         stat.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Unable to find lidar");
+        l_error = true;
+    }
+
+    if (!l_error)
+    {
+        stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "LiDAR OK");
     }
 }
